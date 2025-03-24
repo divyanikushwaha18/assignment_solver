@@ -99,8 +99,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # OpenAI Configuration
-OPENAI_API_KEY = "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"
-
+OPENAI_API_KEY = "test"
 # File Upload Settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
