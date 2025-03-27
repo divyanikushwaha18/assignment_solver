@@ -1,22 +1,22 @@
 import os
 import tempfile
-import openai
+import requests
+import json
 from django.conf import settings
-# To this:
-from ..services.processors.file_processor import FileProcessor
 
 class RequestHandler:
     """
     Handles incoming requests by processing questions and files.
     """
     def __init__(self):
+        from .processors.file_processor import FileProcessor
         self.file_processor = FileProcessor()
-        # Set up OpenAI API key
-        openai.api_key = getattr(settings, 'OPENAI_API_KEY', os.environ.get("OPENAI_API_KEY", ""))
+        # Get AI Proxy token instead of OpenAI API key
+        self.aiproxy_token = settings.AIPROXY_TOKEN or os.environ.get("AIPROXY_TOKEN", "")
         
     def process_request(self, question, file=None):
         """
-        Process the request using OpenAI and specific processors.
+        Process the request using AI Proxy and specific processors.
         
         Args:
             question (str): The question text
@@ -45,15 +45,15 @@ class RequestHandler:
                 if direct_answer:
                     return {"answer": direct_answer}
                 
-                # Now send to OpenAI with the file content
-                return self.query_openai(question, file_info)
+                # Now send to AI Proxy with the file content
+                return self.query_aiproxy(question, file_info)
         
-        # If no file, just send the question to OpenAI
-        return self.query_openai(question)
+        # If no file, just send the question to AI Proxy
+        return self.query_aiproxy(question)
     
     def get_direct_answer(self, question, file_info):
         """
-        Try to directly answer common question patterns without calling OpenAI.
+        Try to directly answer common question patterns without calling AI Proxy.
         
         Args:
             question (str): The question text
@@ -71,9 +71,9 @@ class RequestHandler:
         
         return None
     
-    def query_openai(self, question, file_info=None):
+    def query_aiproxy(self, question, file_info=None):
         """
-        Query OpenAI with the question and file content.
+        Query AI Proxy with the question and file content.
         
         Args:
             question (str): The question text
@@ -83,9 +83,9 @@ class RequestHandler:
             dict: Response with answer key
         """
         try:
-            # Ensure API key is set
-            if not openai.api_key:
-                return {"answer": "Error: OpenAI API key not configured"}
+            # Ensure API token is set
+            if not self.aiproxy_token:
+                return {"answer": "Error: AI Proxy token not configured"}
             
             # Prepare the prompt
             if file_info:
@@ -93,18 +93,35 @@ class RequestHandler:
             else:
                 prompt = f"Question: {question}\n\nAnswer the question directly. Provide ONLY the answer, without any explanations or text."
             
-            # Call OpenAI API
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
+            # Prepare the request to AI Proxy
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.aiproxy_token}"
+            }
+            
+            payload = {
+                "model": "gpt-4o-mini",
+                "messages": [
                     {"role": "system", "content": "You are a helpful assistant for the IIT Madras Online Degree in Data Science. Your task is to answer questions accurately. Provide only the exact answer without any explanations or additional text."},
                     {"role": "user", "content": prompt}
-                ],
-                temperature=0.0  # Use low temperature for more deterministic answers
+                ]
+            }
+            
+            # Call AI Proxy API
+            response = requests.post(
+                "https://aiproxy.sanand.workers.dev/openai/v1/chat/completions",
+                headers=headers,
+                json=payload
             )
             
-            # Extract the answer from OpenAI's response
-            answer = response.choices[0].message.content.strip()
+            # Check if the request was successful
+            response.raise_for_status()
+            
+            # Parse the response
+            response_data = response.json()
+            
+            # Extract the answer from the response
+            answer = response_data['choices'][0]['message']['content'].strip()
             
             return {"answer": answer}
         

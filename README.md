@@ -1,6 +1,12 @@
-# Assignment Solver
+# assignment-solver
 
 TDS IITM Project2: LLM-Based Assignment Solver
+
+## Project Name Conventions
+- Must be lowercase
+- Can include letters, digits, '.', '_', '-'
+- Cannot contain '---'
+- Maximum length: 100 characters
 
 ## Features
 
@@ -12,6 +18,18 @@ TDS IITM Project2: LLM-Based Assignment Solver
   - Audio files
   - Image files
   
+## Project Structure
+```
+assignment-solver/           # Root directory (renamed from Assignment_Solver)
+├── requirements.txt
+├── README.md
+│
+└── solver/
+    └── tests/
+        ├── test_api.py
+        └── test.txt
+```
+
 ## Setup
 
 1. Clone the repository
