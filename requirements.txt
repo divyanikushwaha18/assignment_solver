@@ -12,6 +12,6 @@ SpeechRecognition==3.10.0
 #Pillow==10.2.0
 #pytest==7.4.3
 pytest-django==4.7.0
-#gunicorn==21.2.0
+gunicorn==21.2.0
 openai>=1.0.0
 python-dotenv>=0.19.0
