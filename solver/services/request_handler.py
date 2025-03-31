@@ -32,7 +32,7 @@ class RequestHandler:
         matched, answer = self.question_matcher.match_question(question)
         if matched:
             #return {"answer": answer, "source": "repository"}
-            return {"answer": answer}
+            return {"answer": json.dumps(answer)}
         
         # If there's a file, process it
         file_content = None
@@ -53,7 +53,7 @@ class RequestHandler:
                 direct_answer = self.get_direct_answer(question, file_info)
                 if direct_answer:
                     #return {"answer": direct_answer, "source": "direct"}
-                    return {"answer": direct_answer}
+                    return {"answer": json.dumps(direct_answer)}
                 
                 # Now send to AI Proxy with the file content
                 return self.query_aiproxy(question, file_info)
@@ -135,7 +135,7 @@ class RequestHandler:
             answer = response_data['choices'][0]['message']['content'].strip()
             
             #return {"answer": answer, "source": "ai_proxy"}
-            return {"answer": answer}
+            return {"answer":json.dumps(answer)}
         
         except Exception as e:
             #return {"answer": f"Error: {str(e)}", "source": "error"}
