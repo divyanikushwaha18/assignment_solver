@@ -10,8 +10,8 @@ import pandas as pd
 from pathlib import Path
 
 # API endpoint
-API_URL = "http://localhost:8000/api/"
-#API_URL = "https://assignment-solver.vercel.app/api/"
+#API_URL = "http://localhost:8000/api/"
+API_URL = "https://assignment-solver.vercel.app/api/"
 
 
 # Then modify the call_api function to handle paths better:
