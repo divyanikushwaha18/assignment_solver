@@ -61,7 +61,7 @@ def test_clean_excel_sales_data():
     """
     print("\n===== Testing Clean up Excel sales data (Q1) =====")
     
-    file_path = "test_data/excel_files/sales_data.xlsx"
+    file_path = "test_data/excel_files/q-clean-up-excel-sales-data.xlsx"
     
     question = """RetailWise Inc. is a retail analytics firm that supports companies in optimizing their pricing, margins, and inventory decisions.
     
@@ -90,7 +90,7 @@ def test_clean_student_marks():
     """
     print("\n===== Testing Clean up student marks (Q2) =====")
     
-    file_path = "test_data/text_files/student_marks.txt"
+    file_path = "test_data/text_files/q-clean-up-student-marks.txt"
     
     question = """EduTrack Systems is a leading provider of educational management software that helps schools and universities maintain accurate and up-to-date student records.
     
@@ -116,7 +116,7 @@ def test_apache_log_requests():
     """
     print("\n===== Testing Apache log requests (Q3) =====")
     
-    file_path = "test_data/log_files/apache_log.gz"
+    file_path = "test_data/log_files/s-anand.net-May-2024.gz"
     
     question = """s-anand.net is a personal website that had region-specific music content. One of the site's key sections is telugu, which hosts music files and is especially popular among the local audience.
     
@@ -139,7 +139,7 @@ def test_apache_log_downloads():
     """
     print("\n===== Testing Apache log downloads (Q4) =====")
     
-    file_path = "test_data/log_files/apache_log.gz"
+    file_path = "test_data/log_files/s-anand.net-May-2024.gz"
     
     question = """s-anand.net is a personal website that had region-specific music content. One of the site's key sections is kannada, which hosts music files and is especially popular among the local audience.
     
@@ -162,7 +162,7 @@ def test_clean_sales_data():
     """
     print("\n===== Testing Clean up sales data (Q5) =====")
     
-    file_path = "test_data/csv_files/city_sales.csv"
+    file_path = "test_data/json_files/q-clean-up-sales-data.json"
     
     question = """GlobalRetail Insights is a market research and analytics firm specializing in providing data-driven insights for multinational retail companies.
     
@@ -189,7 +189,7 @@ def test_parse_partial_json():
     """
     print("\n===== Testing Parse partial JSON (Q6) =====")
     
-    file_path = "test_data/json_files/truncated_sales.json"
+    file_path = "test_data/json_files/q-parse-partial-json.jsonl"
     
     question = """ReceiptRevive Analytics is a data recovery and business intelligence firm specializing in processing legacy sales data from paper receipts.
     
@@ -216,7 +216,7 @@ def test_extract_nested_json_keys():
     """
     print("\n===== Testing Extract nested JSON keys (Q7) =====")
     
-    file_path = "test_data/json_files/nested_logs.json"
+    file_path = "test_data/json_files/q-extract-nested-json-keys.json"
     
     question = """DataSure Technologies is a leading provider of IT infrastructure and software solutions, known for its robust systems and proactive maintenance practices.
     

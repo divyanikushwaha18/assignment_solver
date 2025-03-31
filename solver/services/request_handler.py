@@ -3,6 +3,7 @@ import tempfile
 import requests
 import json
 from django.conf import settings
+from .question_matcher import QuestionMatcher
 
 class RequestHandler:
     """
@@ -13,10 +14,12 @@ class RequestHandler:
         self.file_processor = FileProcessor()
         # Get AI Proxy token instead of OpenAI API key
         self.aiproxy_token = settings.AIPROXY_TOKEN or os.environ.get("AIPROXY_TOKEN", "")
+        # Initialize the question matcher
+        self.question_matcher = QuestionMatcher()
         
     def process_request(self, question, file=None):
         """
-        Process the request using AI Proxy and specific processors.
+        Process the request using question repository first, then AI Proxy.
         
         Args:
             question (str): The question text
@@ -25,7 +28,13 @@ class RequestHandler:
         Returns:
             dict: Response with answer key
         """
-        # If there's a file, process it first
+        # First try to match from the question repository
+        matched, answer = self.question_matcher.match_question(question)
+        if matched:
+            #return {"answer": answer, "source": "repository"}
+            return {"answer": answer}
+        
+        # If there's a file, process it
         file_content = None
         if file:
             # Create a temporary directory to save the file
@@ -43,12 +52,13 @@ class RequestHandler:
                 # Try to directly handle simple known question patterns
                 direct_answer = self.get_direct_answer(question, file_info)
                 if direct_answer:
+                    #return {"answer": direct_answer, "source": "direct"}
                     return {"answer": direct_answer}
                 
                 # Now send to AI Proxy with the file content
                 return self.query_aiproxy(question, file_info)
         
-        # If no file, just send the question to AI Proxy
+        # If no file and no repository match, just send the question to AI Proxy
         return self.query_aiproxy(question)
     
     def get_direct_answer(self, question, file_info):
@@ -85,6 +95,7 @@ class RequestHandler:
         try:
             # Ensure API token is set
             if not self.aiproxy_token:
+                #return {"answer": "Error: AI Proxy token not configured", "source": "error"}
                 return {"answer": "Error: AI Proxy token not configured"}
             
             # Prepare the prompt
@@ -123,7 +134,9 @@ class RequestHandler:
             # Extract the answer from the response
             answer = response_data['choices'][0]['message']['content'].strip()
             
+            #return {"answer": answer, "source": "ai_proxy"}
             return {"answer": answer}
         
         except Exception as e:
+            #return {"answer": f"Error: {str(e)}", "source": "error"}
             return {"answer": f"Error: {str(e)}"}

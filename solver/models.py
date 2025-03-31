@@ -17,3 +17,15 @@ class Solution(models.Model):
     
     def __str__(self):
         return f"Solution for {self.assignment.title}"
+    
+class QuestionRepository(models.Model):
+    assignment_number = models.IntegerField()
+    question_number = models.IntegerField()
+    question_text = models.TextField()
+    answer_text = models.TextField()
+    # Store keywords for basic matching
+    keywords = models.TextField(blank=True, help_text="Comma-separated keywords")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Assignment {self.assignment_number}, Question {self.question_number}"

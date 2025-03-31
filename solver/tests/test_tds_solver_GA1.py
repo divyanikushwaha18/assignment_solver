@@ -10,8 +10,8 @@ import pandas as pd
 from pathlib import Path
 
 # API endpoint
-#API_URL = "http://localhost:8000/api/"
-API_URL = "https://assignment-solver.vercel.app/api/"
+API_URL = "http://localhost:8000/api/"
+#API_URL = "https://assignment-solver.vercel.app/api/"
 
 
 # Then modify the call_api function to handle paths better:
@@ -19,42 +19,69 @@ def call_api(question, file_path=None, file_name=None):
     """
     Call the TDS Solver API with a question and optional file.
     """
-    if file_path:
-        # Convert to proper path for the current OS
-        file_path = Path(file_path)
-        
-        # Check if file exists
-        if not file_path.exists():
-            print(f"Error: File not found: {file_path}")
-            # Try to look for the file in the current directory or test_data
-            alternative_paths = [
-                Path("test_data") / file_path.name,
-                Path("test_data") / file_path.parts[-2] / file_path.name,
-                Path.cwd() / file_path.name
-            ]
+    try:
+        if file_path:
+            # Convert to proper path for the current OS
+            file_path = Path(file_path)
             
-            for alt_path in alternative_paths:
-                if alt_path.exists():
-                    print(f"Found file at alternative location: {alt_path}")
-                    file_path = alt_path
-                    break
-            else:
-                return {"error": f"File not found: {file_path}"}
-        
-        with open(file_path, 'rb') as file_data:
+            # Check if file exists
+            if not file_path.exists():
+                print(f"Error: File not found: {file_path}")
+                # Try to look for the file in the current directory or test_data
+                alternative_paths = [
+                    Path("test_data") / file_path.name,
+                    Path("test_data") / file_path.parts[-2] / file_path.name,
+                    Path.cwd() / file_path.name
+                ]
+                
+                for alt_path in alternative_paths:
+                    if alt_path.exists():
+                        print(f"Found file at alternative location: {alt_path}")
+                        file_path = alt_path
+                        break
+                else:
+                    return {"error": f"File not found: {file_path}"}
+            
+            with open(file_path, 'rb') as file_data:
+                files = {
+                    'question': (None, question),
+                    'file': (file_name or file_path.name, file_data)
+                }
+                response = requests.post(API_URL, files=files)
+        else:
             files = {
-                'question': (None, question),
-                'file': (file_name or file_path.name, file_data)
+                'question': (None, question)
             }
             response = requests.post(API_URL, files=files)
-    else:
-        files = {
-            'question': (None, question)
+        
+        # Add debugging information
+        print(f"Response status code: {response.status_code}")
+        print(f"Response headers: {response.headers}")
+        print(f"Response content: {response.text[:500]}...")  # Print first 500 chars to avoid overwhelming output
+        
+        # Check if we got a valid response before trying to parse JSON
+        if response.status_code != 200:
+            return {
+                "error": f"API request failed with status code {response.status_code}",
+                "response_text": response.text
+            }
+        
+        # Check if there's content to parse
+        if not response.text.strip():
+            return {"error": "Empty response received from API"}
+            
+        # Try to parse JSON response
+        return response.json()
+        
+    except requests.exceptions.RequestException as e:
+        # Handle network-related errors
+        return {"error": f"Request failed: {str(e)}"}
+    except json.JSONDecodeError as e:
+        # Handle JSON parsing errors
+        return {
+            "error": f"Failed to parse JSON response: {str(e)}",
+            "response_text": response.text
         }
-        response = requests.post(API_URL, files=files)
-    
-    return response.json()
-
 def test_vs_code_version():
     """
     Test Q1: VS Code Version
